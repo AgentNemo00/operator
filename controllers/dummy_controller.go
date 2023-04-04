@@ -186,7 +186,6 @@ func (r *DummyReconciler) CreatePod(ctx context.Context, name, namespace string)
 				Image: "nginx",
 			}},
 		},
-		Status: v1.PodStatus{},
 	}
 	return r.Create(ctx, nginx)
 }
