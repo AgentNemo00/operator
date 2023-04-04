@@ -1,0 +1,12 @@
+apiVersion: interview.com/v1alpha1
+kind: Dummy
+metadata:
+  labels:
+    app.kubernetes.io/name: dummy
+    app.kubernetes.io/instance: dummy-sample
+    app.kubernetes.io/part-of: operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: operator
+  name: dummy-sample
+spec:
+  message: "I'm just a dummy"
