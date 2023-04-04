@@ -27,6 +27,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"time"
 
 	interviewcomv1alpha1 "github.com/AgentNemo00/operator/api/v1alpha1"
 )
@@ -94,7 +95,7 @@ func (r *DummyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 			}
 		}
 		// if not requeue
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: time.Second * 3}, nil
 	case v1.PodRunning:
 		// check if pod exits
 		ok, err := r.HasPod(ctx, nginxName, req.Namespace)
@@ -122,7 +123,7 @@ func (r *DummyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 			}
 			return ctrl.Result{Requeue: true}, nil
 		}
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{}, nil
 	}
 	return ctrl.Result{}, nil
 }
