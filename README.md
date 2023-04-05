@@ -29,6 +29,8 @@ make deploy IMG=<some-registry>/operator:tag
 
 ### Pull Image
 
+The image can be found at https://hub.docker.com/r/agentnemo00/dummy-operator
+
 ````sh
 docker pull agentnemo00/dummy-operator:latest
 ````
@@ -45,6 +47,12 @@ UnDeploy the controller from the cluster:
 
 ```sh
 make undeploy
+```
+
+### Tests
+
+```sh
+make test
 ```
 
 ## Contributing
