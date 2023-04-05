@@ -151,7 +151,7 @@ func (r *DummyReconciler) processPending(ctx context.Context, req ctrl.Request, 
 	if err != nil {
 		return ctrl.Result{}, err
 	}
-	// check if pod if ready
+	// check if pod is ready
 	if pod.Status.Phase == v1.PodRunning {
 		dummy.Status.PodStatus = v1.PodRunning
 		err = r.Status().Update(ctx, dummy)
@@ -190,7 +190,7 @@ func (r *DummyReconciler) getPod(ctx context.Context, name, namespace string) (*
 	}, p)
 }
 
-// hasPod - check if an pod is there
+// hasPod - check if a pod is there
 func (r *DummyReconciler) hasPod(ctx context.Context, name, namespace string) (bool, error) {
 	p := &v1.Pod{}
 	err := r.Get(ctx, types.NamespacedName{
