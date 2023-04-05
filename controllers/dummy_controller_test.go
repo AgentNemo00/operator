@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	interviewcomv1alpha1 "github.com/AgentNemo00/operator/api/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -11,6 +12,19 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	"testing"
 )
+
+type CustomReader struct {
+	GetCallback  func(ctx context.Context, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error
+	ListCallback func(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error
+}
+
+func (c CustomReader) Get(ctx context.Context, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error {
+	return c.GetCallback(ctx, key, obj, opts...)
+}
+
+func (c CustomReader) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
+	return c.ListCallback(ctx, list, opts...)
+}
 
 func initClient(t *testing.T) client.Client {
 	testEnv = &envtest.Environment{
@@ -27,6 +41,7 @@ func initClient(t *testing.T) client.Client {
 		t.Errorf(err.Error())
 		return nil
 	}
+
 	k8sClient, err = client.New(testEnvCfg, client.Options{Scheme: scheme.Scheme})
 	if err != nil {
 		t.Errorf(err.Error())
@@ -100,6 +115,34 @@ func TestDummyReconciler_deletePod(t *testing.T) {
 				namespace: "default",
 			},
 			wantErr: false,
+		},
+		{
+			name: "error",
+			fields: fields{
+				Client: func(t *testing.T) client.Client {
+					c := initClient(t)
+					if c == nil {
+						return c
+					}
+					c, err := client.NewDelegatingClient(client.NewDelegatingClientInput{
+						CacheReader: CustomReader{
+							GetCallback: func(ctx context.Context, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error {
+								return fmt.Errorf("error during fetching")
+							}},
+						Client: c,
+					})
+					if err != nil {
+						return nil
+					}
+					return c
+				}(t),
+			},
+			args: args{
+				ctx:       context.Background(),
+				name:      "example-pod",
+				namespace: "default",
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
