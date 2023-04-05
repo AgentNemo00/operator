@@ -18,6 +18,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -92,6 +93,12 @@ func main() {
 	if err = (&controllers.DummyReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
+		PodTemplates: map[string]controllers.SubPods{"nginx": {
+			Template: "config/nginx/nginx.yaml",
+			Naming: func(req ctrl.Request) string {
+				return fmt.Sprintf("nginx-%s", req.Name)
+			},
+		}},
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Dummy")
 		os.Exit(1)
